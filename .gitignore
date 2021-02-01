@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# vscode
+.vscode
+
+# docker env
+dev.env
+
+# shell env
+shellenv.sh
