@@ -5,5 +5,10 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.ContentUploadViewSet.as_view({'post': 'create'})),
+    path('', views.ContentUploadViewSet.as_view(
+        {
+            'get': 'retrieve',
+            'post': 'create'
+        }
+    )),
 ]
