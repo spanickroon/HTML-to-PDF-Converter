@@ -5,5 +5,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.FileUploadView.as_view()),
+    path('', views.ContentUploadViewSet.as_view({'post': 'create'})),
 ]
