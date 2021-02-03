@@ -6,9 +6,14 @@ from .serializers import ContentUploadSerializer
 from .services import ConverterService
 from django.http import HttpResponse
 
+from rest_framework.renderers import TemplateHTMLRenderer
+
 
 class ContentUploadViewSet(ViewSet):
+
     serializer_class = ContentUploadSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'converting_data.html'
 
     def create(self, request: Request) -> Response:
         response = Response()
@@ -17,12 +22,12 @@ class ContentUploadViewSet(ViewSet):
         url_upload = request.data.get('url_upload')
 
         if file_upload:
-            ConverterService.converting_html_file_to_pdf(file_upload)
+            return ConverterService.converting_html_file_to_pdf(file_upload)
 
         # if url_upload:
             # response.append(url_upload)
 
-        return ConverterService.returning_file_information(file_upload)
+        return Response({'serializer': ContentUploadSerializer})
 
-    def retrieve(self, request: Request):
-        return HttpResponse('test')
+    def retrieve(self, request: Request) -> Response:
+        return Response({'serializer': ContentUploadSerializer})

@@ -15,13 +15,16 @@ class ConverterService:
         pisa_obj = pisa.pisaDocument(html_file.read(), pdf_file)
 
         if not pisa_obj.err:
-            response = HttpResponse(pdf_file.getvalue(), content_type='application/pdf')
-            return response
+            return HttpResponse(
+                pdf_file.getvalue(),
+                content_type='application/pdf'
+            )
 
-        return Response('')
+        return Response()
 
     @staticmethod
-    def returning_file_information(html_file: InMemoryUploadedFile) -> Response:
+    def returning_file_information(
+            html_file: InMemoryUploadedFile) -> Response:
         return Response({
             'name': html_file.name,
             'type': html_file.content_type,
