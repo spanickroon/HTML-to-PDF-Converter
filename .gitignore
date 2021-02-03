@@ -136,3 +136,6 @@ dev.env
 
 # shell env
 shellenv.sh
+
+# staticfiles
+staticfiles

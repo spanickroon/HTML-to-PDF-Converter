@@ -1,6 +1,5 @@
 {% load rest_framework %}
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,12 +8,15 @@
     <title>HTML to PDF</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <h1>Тест</h1>
-    <form enctype="multipart/form-data" method="POST" target="_blank">
-        {% csrf_token %}
-        {% render_form serializer %}
-        <input type="submit" value="Save">
-    </form>
+<body class="convertation-body">
+    <div class="convertation-block">
+        <h1 class="convertation-name">Конвертация HTML в PDF</h1>
+        <form class="convertation-form" enctype="multipart/form-data" method="POST" target="_blank">
+            {% csrf_token %}
+            {% render_form serializer %}
+            <input class="convertation-button" type="submit" value="Конвертировать">
+        </form>
+    </div>
 </body>
+<script src="{% static "js/style.js" %}"></script>
 </html>
