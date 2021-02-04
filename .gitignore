@@ -136,3 +136,12 @@ dev.env
 
 # shell env
 shellenv.sh
+
+# staticfiles
+staticfiles
+
+# converting files
+pdf_generator/static/files
+
+# temp files
+*.db
