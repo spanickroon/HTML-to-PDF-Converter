@@ -1,5 +1,6 @@
 import os
 import pdfkit
+import requests
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -7,6 +8,9 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 class ConverterService:
+
+    output_html = 'output.html'
+    output_pdf = 'output.pdf'
 
     @staticmethod
     def creating_path_for_converting_files() -> str:
@@ -23,23 +27,71 @@ class ConverterService:
 
         MCFR = ConverterService.creating_path_for_converting_files()
 
-        with open(os.path.join(MCFR, 'output.html'), 'w+b') as wf:
-            wf.write(html_file.read())
+        try:
+            file_path = os.path.join(MCFR, ConverterService.output_html)
 
-        pdfkit.from_file(
-            os.path.join(MCFR, 'output.html'),
-            os.path.join(MCFR, 'output.pdf')
-        )
+            with open(file_path, 'w+b') as wf:
+                wf.write(html_file.read())
 
-        with open(os.path.join(MCFR, 'output.pdf'), 'rb') as rf:
-            return HttpResponse(rf.read(), 'application/pdf')
+            pdfkit.from_file(
+                os.path.join(MCFR, ConverterService.output_html),
+                os.path.join(MCFR, ConverterService.output_pdf)
+            )
+
+            file_path = os.path.join(MCFR, ConverterService.output_pdf)
+
+            with open(os.path.join(MCFR, file_path), 'rb') as rf:
+                return HttpResponse(rf.read(), 'application/pdf')
+        except OSError:
+            return HttpResponse('error')
 
     @staticmethod
     def converting_url_to_pdf(url: str) -> HttpResponse:
         MCFR = ConverterService.creating_path_for_converting_files()
 
-        output_html = os.path.join(MCFR, 'output.html')
-        pdfkit.from_url(url, output_html)
+        try:
+            output_html = os.path.join(MCFR, ConverterService.output_html)
+            pdfkit.from_url(url, output_html)
 
-        with open(output_html, 'rb') as rf:
-            return HttpResponse(rf.read(), 'application/pdf')
+            with open(output_html, 'rb') as rf:
+                return HttpResponse(rf.read(), 'application/pdf')
+        except OSError:
+            return HttpResponse('error')
+
+
+class CheckingValidityIncomingData:
+
+    def __init__(self, file_upload: InMemoryUploadedFile, url_upload: str):
+        self.file_upload = file_upload
+        self.url_upload = url_upload
+
+    def checking_file_validation(self) -> bool:
+        try:
+            return self.file_upload.content_type == 'text/html'
+        except AttributeError:
+            return False
+
+    def checking_requested_resource(self) -> bool:
+        try:
+            requests.get(self.url_upload)
+            return True
+        except requests.exceptions.ConnectionError:
+            return False
+
+
+class DistributionEnteredData:
+
+    @staticmethod
+    def procesing_request_by_data_priority(
+            file_upload: InMemoryUploadedFile,
+            url_upload: str) -> HttpResponse:
+
+        checker_data = CheckingValidityIncomingData(file_upload, url_upload)
+
+        if file_upload and checker_data.checking_file_validation():
+            return ConverterService.converting_html_file_to_pdf(file_upload)
+
+        if url_upload and checker_data.checking_requested_resource():
+            return ConverterService.converting_url_to_pdf(url_upload)
+
+        return HttpResponse('No data')

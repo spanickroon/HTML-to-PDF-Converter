@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.renderers import TemplateHTMLRenderer
 
+from django.http import HttpResponse
 from .serializers import ContentUploadSerializer
-from .services import ConverterService
+from .services import DistributionEnteredData
 
 
 class ContentUploadViewSet(ViewSet):
@@ -13,17 +14,14 @@ class ContentUploadViewSet(ViewSet):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'converting_data.html'
 
-    def create(self, request: Request) -> Response:
+    def create(self, request: Request) -> HttpResponse:
         file_upload = request.data.get('file_upload')
         url_upload = request.data.get('url_upload')
 
-        if file_upload:
-            return ConverterService.converting_html_file_to_pdf(file_upload)
-
-        if url_upload:
-            return ConverterService.converting_url_to_pdf(url_upload)
-
-        return Response({'serializer': ContentUploadSerializer})
+        return DistributionEnteredData.procesing_request_by_data_priority(
+            file_upload,
+            url_upload
+        )
 
     def retrieve(self, request: Request) -> Response:
         return Response({'serializer': ContentUploadSerializer})
