@@ -50,12 +50,14 @@ class ConverterService:
         MCFR = ConverterService.creating_path_for_converting_files()
 
         try:
-            output_html = os.path.join(MCFR, ConverterService.output_html)
-            pdfkit.from_url(url, output_html)
+            file_path = os.path.join(MCFR, ConverterService.output_pdf)
 
-            with open(output_html, 'rb') as rf:
+            pdfkit.from_url(url, file_path)
+
+            with open(file_path, 'rb') as rf:
                 return HttpResponse(rf.read(), 'application/pdf')
-        except OSError:
+        except OSError as e:
+            print(e)
             return HttpResponse('error')
 
 
