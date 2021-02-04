@@ -1,9 +1,7 @@
-import requests
-from bs4 import BeautifulSoup
-from io import BytesIO
-from xhtml2pdf import pisa
+import os
+import pdfkit
 
-from rest_framework.response import Response
+from django.conf import settings
 from django.http import HttpResponse
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -11,30 +9,37 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 class ConverterService:
 
     @staticmethod
-    def converting_html_file_to_pdf(html_file: bytes) -> HttpResponse:
-        pdf_file = BytesIO()
-        pisa_obj = pisa.pisaDocument(html_file, pdf_file)
+    def creating_path_for_converting_files() -> str:
+        MCFR = settings.MEDIA_CONVERTING_FILES_ROOT
 
-        if not pisa_obj.err:
-            return HttpResponse(
-                pdf_file.getvalue(),
-                content_type='application/pdf'
-            )
+        if not os.path.exists(MCFR):
+            os.makedirs(MCFR)
 
-        return HttpResponse()
+        return MCFR
 
     @staticmethod
-    def returning_file_information(
-            html_file: InMemoryUploadedFile) -> Response:
-        return Response({
-            'name': html_file.name,
-            'type': html_file.content_type,
-            'size': html_file.size
-        })
+    def converting_html_file_to_pdf(
+            html_file: InMemoryUploadedFile) -> HttpResponse:
 
+        MCFR = ConverterService.creating_path_for_converting_files()
 
-class HTMLScraperService:
+        with open(os.path.join(MCFR, 'output.html'), 'w+b') as wf:
+            wf.write(html_file.read())
+
+        pdfkit.from_file(
+            os.path.join(MCFR, 'output.html'),
+            os.path.join(MCFR, 'output.pdf')
+        )
+
+        with open(os.path.join(MCFR, 'output.pdf'), 'rb') as rf:
+            return HttpResponse(rf.read(), 'application/pdf')
 
     @staticmethod
-    def scraping_html(url: str) -> BeautifulSoup:
-        return BeautifulSoup(requests.get(url).content, 'html.parser')
+    def converting_url_to_pdf(url: str) -> HttpResponse:
+        MCFR = ConverterService.creating_path_for_converting_files()
+
+        output_html = os.path.join(MCFR, 'output.html')
+        pdfkit.from_url(url, output_html)
+
+        with open(output_html, 'rb') as rf:
+            return HttpResponse(rf.read(), 'application/pdf')

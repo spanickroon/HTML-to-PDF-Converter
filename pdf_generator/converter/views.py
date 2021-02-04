@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from .serializers import ContentUploadSerializer
-from .services import ConverterService, HTMLScraperService
+from .services import ConverterService
 
 
 class ContentUploadViewSet(ViewSet):
@@ -18,11 +18,10 @@ class ContentUploadViewSet(ViewSet):
         url_upload = request.data.get('url_upload')
 
         if file_upload:
-            return ConverterService.converting_html_file_to_pdf(file_upload.read())
+            return ConverterService.converting_html_file_to_pdf(file_upload)
 
         if url_upload:
-            html_file = HTMLScraperService.scraping_html(url_upload).encode()
-            return ConverterService.converting_html_file_to_pdf(html_file)
+            return ConverterService.converting_url_to_pdf(url_upload)
 
         return Response({'serializer': ContentUploadSerializer})
 
