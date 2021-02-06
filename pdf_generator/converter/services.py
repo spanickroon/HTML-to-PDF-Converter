@@ -56,8 +56,7 @@ class ConverterService:
 
             with open(file_path, 'rb') as rf:
                 return HttpResponse(rf.read(), 'application/pdf')
-        except OSError as e:
-            print(e)
+        except OSError:
             return HttpResponse('error')
 
 
