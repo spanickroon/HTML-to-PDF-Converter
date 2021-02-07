@@ -1,3 +1,5 @@
+"""Application views module."""
+
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -10,12 +12,15 @@ from .services.converter import Converter
 
 
 class ContentUploadViewSet(ViewSet):
+    """Main view that is responsible for get and post requests."""
 
     serializer_class = ContentUploadSerializer
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'converting_data.html'
 
-    def create(self, request: Request) -> Response:
+    def create(self, request: Request) -> HttpResponse:
+        """The method that is triggered on post request."""
+
         file_upload = request.data.get('file_upload')
         url_upload = request.data.get('url_upload')
         email_upload = request.data.get('email_upload')
@@ -27,4 +32,6 @@ class ContentUploadViewSet(ViewSet):
         )
 
     def retrieve(self, request: Request) -> Response:
+        """The method that is triggered on get request."""
+
         return Response({'serializer': ContentUploadSerializer})

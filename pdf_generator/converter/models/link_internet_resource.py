@@ -1,7 +1,14 @@
+"""Module with models for links."""
+
 from django.db import models
 
 
 class LinkInternetResource(models.Model):
+    """
+    The class that stores unique Internet resource.
+
+    Has one field - a link to the resource.
+    """
 
     link = models.URLField(
         max_length=256,
@@ -17,4 +24,5 @@ class LinkInternetResource(models.Model):
         verbose_name_plural = 'Ссылки на интернет ресурс'
 
     def __str__(self) -> str:
+        """Magic method that returns a reference when working with a model."""
         return self.link

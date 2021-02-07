@@ -1,26 +1,26 @@
+"""The main service module in which data is converted."""
+
 import os
 import time
 
 import pdfkit
-import tempfile
 import requests
 
 from datetime import datetime
 
-from django.http import HttpResponse
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.auth.models import User
-
-from rest_framework.response import Response
 
 from ..models import ProcessingRequest, LinkInternetResource
 
 
 class ConverterService:
+    """Service class responsible for data transformation."""
 
     @staticmethod
     def _generate_file_name(email_upload: str, file_type: str) -> str:
+        """A method that generates a unique filename based on time."""
         file_name = []
         time_now = datetime.now().strftime('%d.%m.%Y %H.%M.%S')
 
@@ -36,6 +36,11 @@ class ConverterService:
             email_upload: str,
             conversion_url: str,
             conversion_file: InMemoryUploadedFile) -> int:
+        """
+        A method that creates a new request and returns an ID task.
+        
+        Which helps in further methods.
+        """
 
         recipient, _ = User.objects.get_or_create(
             username=email_upload,
@@ -66,6 +71,11 @@ class ConverterService:
 
     @staticmethod
     def converting_from_file(task_id: int, final_file_name: str) -> None:
+        """
+        A method that converts a html file to pdf based on the pdfkit library.
+        
+        Sets the task status to in progress.
+        """
         recipient = ProcessingRequest.objects.get(task_id=task_id)
         recipient.status = 2
 
@@ -88,6 +98,11 @@ class ConverterService:
 
     @staticmethod
     def converting_from_url(task_id: int, final_file_name: str) -> None:
+        """
+        A method that converts a urlto pdf based on the pdfkit library.
+        
+        Sets the task status to in progress.
+        """
         recipient = ProcessingRequest.objects.get(task_id=task_id)
         recipient.status = 2
 
