@@ -5,7 +5,8 @@ from rest_framework.renderers import TemplateHTMLRenderer
 
 from django.http import HttpResponse
 from .serializers import ContentUploadSerializer
-from .services import DistributionEnteredData
+from .services.distribution_entered_data import DistributionEnteredData
+from .services.converter import Converter
 
 
 class ContentUploadViewSet(ViewSet):

@@ -1,10 +1,9 @@
-from django.http import HttpResponse
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from rest_framework.response import Response
 
 from .checking_validity_incoming_data import CheckingValidityIncomingData
-from .converter_service import ConverterService
+from .converter import Converter
 
 from ..serializers import ContentUploadSerializer
 
@@ -21,13 +20,13 @@ class DistributionEnteredData:
 
         if email_upload:
             if file_upload and checker_data.checking_file_validation():
-                return ConverterService.converting_html_file_to_pdf(
+                Converter.converting_html_file_to_pdf(
                     file_upload,
                     email_upload
                 )
 
             if url_upload and checker_data.checking_requested_resource():
-                return ConverterService.converting_url_to_pdf(
+                Converter.converting_url_to_pdf(
                     url_upload,
                     email_upload
                 )

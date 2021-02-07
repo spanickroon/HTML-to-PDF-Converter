@@ -42,7 +42,7 @@ class ConverterService:
             email=email_upload)
 
         if conversion_file:
-            html_file.name = ConverterService._generate_file_name(
+            conversion_file.name = ConverterService._generate_file_name(
                 email_upload, '.html')
 
         if conversion_url:
@@ -69,19 +69,22 @@ class ConverterService:
         recipient = ProcessingRequest.objects.get(task_id=task_id)
         recipient.status = 2
 
-        with tempfile.NamedTemporaryFile(suffix='.html') as temp_html:
-            with tempfile.NamedTemporaryFile(suffix='.pdf') as temp_pdf:
-                content = requests.get(recipient.conversion_file.url).content
-                temp_html.write(content)
+        with open(f'{final_file_name}.html', 'w+b') as temp_html:
+            content = requests.get(recipient.conversion_file.url).content
+            temp_html.write(content)
 
-                pdfkit.from_file(temp_html.name, temp_pdf.name)
+        pdfkit.from_file(f'{final_file_name}.html', f'{final_file_name}')
 
-                recipient.final_file = ContentFile(
-                    temp_pdf.read(),
-                    f'{final_file_name}'
-                )
+        with open(f'{final_file_name}', 'rb') as temp_pdf:
+            recipient.final_file = ContentFile(
+                temp_pdf.read(),
+                f'{final_file_name}'
+            )
 
         recipient.save()
+
+        os.remove(f'{final_file_name}.html')
+        os.remove(f'{final_file_name}')
 
     @staticmethod
     def converting_from_url(task_id: int, final_file_name: str) -> None:
@@ -101,46 +104,3 @@ class ConverterService:
 
         recipient.save()
         os.remove(f'{final_file_name}')
-
-    @staticmethod
-    def converting_html_file_to_pdf(
-            html_file: InMemoryUploadedFile,
-            email_upload: str) -> HttpResponse:
-
-        try:
-            task_id = ConverterService._create_new_request(
-                email_upload=email_upload,
-                conversion_url=None,
-                conversion_file=html_file
-            )
-
-            final_file_name = ConverterService._generate_file_name(
-                email_upload, '.pdf')
-
-        except (OSError, AttributeError, FileNotFoundError):
-            return HttpResponse('error')
-
-        ConverterService.converting_from_url(task_id, final_file_name)
-
-        return HttpResponse('ok')
-
-    @staticmethod
-    def converting_url_to_pdf(
-            url_upload: str,
-            email_upload: str) -> HttpResponse:
-        try:
-            task_id = ConverterService._create_new_request(
-                email_upload=email_upload,
-                conversion_url=url_upload,
-                conversion_file=None
-            )
-
-            final_file_name = ConverterService._generate_file_name(
-                email_upload, '.pdf')
-
-        except (OSError, AttributeError, FileNotFoundError):
-            return HttpResponse('error')
-
-        ConverterService.converting_from_url(task_id, final_file_name)
-
-        return HttpResponse('ok')
