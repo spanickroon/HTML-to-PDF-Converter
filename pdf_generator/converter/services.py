@@ -6,6 +6,10 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from rest_framework.response import Response
+
+from .serializers import ContentUploadSerializer
+
 
 class ConverterService:
 
@@ -85,7 +89,8 @@ class DistributionEnteredData:
     @staticmethod
     def procesing_request_by_data_priority(
             file_upload: InMemoryUploadedFile,
-            url_upload: str) -> HttpResponse:
+            url_upload: str,
+            email_upload: str) -> Response:
 
         checker_data = CheckingValidityIncomingData(file_upload, url_upload)
 
@@ -95,4 +100,4 @@ class DistributionEnteredData:
         if url_upload and checker_data.checking_requested_resource():
             return ConverterService.converting_url_to_pdf(url_upload)
 
-        return HttpResponse('No data')
+        return Response({'serializer': ContentUploadSerializer})
