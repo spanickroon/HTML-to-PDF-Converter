@@ -1,5 +1,12 @@
 version: '3.7'
 services:
+  db:
+    container_name: postgres
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   web:
     tty: true
     stdin_open: true
@@ -12,6 +19,8 @@ services:
       - 8000:8000
     env_file:
       - ./dev.env
+    depends_on:
+      - db
 
   redis:
     container_name: redis
@@ -33,4 +42,5 @@ services:
       - redis
 
 volumes:
+  postgres_data:
   redis_data:
