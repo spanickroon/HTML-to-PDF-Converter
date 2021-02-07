@@ -1,15 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-from .recipient import Recipient
 from .link_internet_resource import LinkInternetResource
 
 
 class ProcessingRequest(models.Model):
 
-    recipient_email = models.ForeignKey(
-        Recipient,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
-        related_name='emails',
         verbose_name='Получатель'
     )
 
@@ -24,18 +23,25 @@ class ProcessingRequest(models.Model):
         null=True,
         verbose_name='Дата завершения заявки')
 
-    conversion_file_link = models.FileField(
+    conversion_file = models.FileField(
         upload_to='documents/html',
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         verbose_name='Html файл для конвертирования'
     )
 
-    conversion_link = models.ForeignKey(
+    conversion_url = models.ForeignKey(
         LinkInternetResource,
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
-        related_name='emails',
         verbose_name='Ссылка на ресурс для конвертирования'
+    )
+
+    task_id = models.BigIntegerField(
+        blank=True,
+        null=True,
+        verbose_name='ID задачи'
     )
 
     STATUS_CHOICES = (
@@ -54,7 +60,7 @@ class ProcessingRequest(models.Model):
     final_file = models.FileField(
         upload_to='documents/pdf',
         blank=True,
-        unique=True,
+        null=True,
         verbose_name='Итоговый файл pdf'
     )
 
@@ -69,3 +75,6 @@ class ProcessingRequest(models.Model):
 
         verbose_name = 'Заявка на преобразование в pdf'
         verbose_name_plural = 'Заявки на преобразование в pdf'
+
+    def __str__(self) -> str:
+        return f'{self.user.email} - {self.status}'

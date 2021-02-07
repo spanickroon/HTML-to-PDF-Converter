@@ -13,7 +13,7 @@ function giveStyles() {
     document.getElementsByName('email_upload')[0].classList.add('convertation-form-control');
     document.getElementsByName('email_upload')[0].setAttribute('placeholder', 'example@email.com');
 
-    //document.getElementsByName('email_upload')[0].setAttribute('required', true);
+    document.getElementsByName('email_upload')[0].setAttribute('required', true);
 }
 
 giveStyles();

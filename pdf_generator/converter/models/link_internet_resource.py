@@ -15,3 +15,6 @@ class LinkInternetResource(models.Model):
 
         verbose_name = 'Ссылка на интернет ресурс'
         verbose_name_plural = 'Ссылки на интернет ресурс'
+
+    def __str__(self) -> str:
+        return self.link
