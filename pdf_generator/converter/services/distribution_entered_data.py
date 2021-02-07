@@ -1,20 +1,27 @@
-from django.core.files.uploadedfile import InMemoryUploadedFile
+"""A module that expands data by methods."""
 
-from rest_framework.response import Response
+from django.http import HttpResponse
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from .checking_validity_incoming_data import CheckingValidityIncomingData
 from .converter import Converter
 
-from ..serializers import ContentUploadSerializer
-
 
 class DistributionEnteredData:
+    """Class of distribution of received data after post request."""
 
     @staticmethod
     def procesing_request_by_data_priority(
             file_upload: InMemoryUploadedFile,
             url_upload: str,
-            email_upload: str) -> Response:
+            email_upload: str) -> HttpResponse:
+        """
+        A method that checks the data and then sends it for processing,
+
+        while the file is processed first and then the link.
+        Returns the answer without waiting for the execution result,
+        because the celety is engaged in other functions.
+        """
 
         checker_data = CheckingValidityIncomingData(file_upload, url_upload)
 
@@ -31,4 +38,4 @@ class DistributionEnteredData:
                     email_upload
                 )
 
-        return Response({'serializer': ContentUploadSerializer})
+        return HttpResponse({'status': 'ok'})

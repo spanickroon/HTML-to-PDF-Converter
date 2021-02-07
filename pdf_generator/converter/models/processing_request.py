@@ -1,3 +1,5 @@
+"""Module with a model of requests for processing."""
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -5,6 +7,21 @@ from .link_internet_resource import LinkInternetResource
 
 
 class ProcessingRequest(models.Model):
+    """
+    Model with a request for processing or file or link.
+
+    Consists of fields:
+        *user - binding from the standard model via email;
+        *create_datetime - time of order creation;
+        *conversion_file - file for processing, can be empty if a link to an
+            Internet resource is sent;
+        *conversion_url - processing link, can be empty if file is transferred;
+        *task_id - id of the task that performs transformations
+            with the transmitted data;
+        *status - the status of the request can be of three types:
+            in processing, in progress and ready;
+        *final_file - conversion result, link to pdf file.
+    """
 
     user = models.ForeignKey(
         User,
@@ -17,11 +34,6 @@ class ProcessingRequest(models.Model):
         blank=True,
         null=True,
         verbose_name='Дата создания заявки')
-
-    done_datetime = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name='Дата завершения заявки')
 
     conversion_file = models.FileField(
         upload_to='documents/html',
@@ -64,12 +76,6 @@ class ProcessingRequest(models.Model):
         verbose_name='Итоговый файл pdf'
     )
 
-    resulting_file_size = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name='Размер итогового файла'
-    )
-
     class Meta:
         """Meta data."""
 
@@ -77,4 +83,5 @@ class ProcessingRequest(models.Model):
         verbose_name_plural = 'Заявки на преобразование в pdf'
 
     def __str__(self) -> str:
+        """Magic method that returns a reference when working with a model."""
         return f'{self.user.email} - {self.status}'

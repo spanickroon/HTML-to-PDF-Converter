@@ -1,3 +1,5 @@
+"""Celery connection module to the project."""
+
 import os
 from celery import Celery
 
