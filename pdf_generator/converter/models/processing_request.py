@@ -24,11 +24,11 @@ class ProcessingRequest(models.Model):
         null=True,
         verbose_name='Дата завершения заявки')
 
-    conversion_file_link = models.URLField(
-        max_length=255,
+    conversion_file_link = models.FileField(
+        upload_to='documents/html',
         blank=False,
         null=False,
-        verbose_name='Ссылка на файл для конвертирования'
+        verbose_name='Html файл для конвертирования'
     )
 
     conversion_link = models.ForeignKey(
@@ -51,11 +51,11 @@ class ProcessingRequest(models.Model):
         verbose_name='Статус заявки',
     )
 
-    final_file_link = models.URLField(
-        max_length=256,
+    final_file = models.FileField(
+        upload_to='documents/pdf',
         blank=True,
         unique=True,
-        verbose_name='Ссылка на итоговый файл'
+        verbose_name='Итоговый файл pdf'
     )
 
     resulting_file_size = models.IntegerField(
