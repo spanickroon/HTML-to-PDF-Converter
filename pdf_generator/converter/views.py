@@ -5,7 +5,8 @@ from rest_framework.renderers import TemplateHTMLRenderer
 
 from django.http import HttpResponse
 from .serializers import ContentUploadSerializer
-from .services import DistributionEnteredData
+from .services.distribution_entered_data import DistributionEnteredData
+from .services.converter import Converter
 
 
 class ContentUploadViewSet(ViewSet):
@@ -14,13 +15,15 @@ class ContentUploadViewSet(ViewSet):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'converting_data.html'
 
-    def create(self, request: Request) -> HttpResponse:
+    def create(self, request: Request) -> Response:
         file_upload = request.data.get('file_upload')
         url_upload = request.data.get('url_upload')
+        email_upload = request.data.get('email_upload')
 
         return DistributionEnteredData.procesing_request_by_data_priority(
             file_upload,
-            url_upload
+            url_upload,
+            email_upload
         )
 
     def retrieve(self, request: Request) -> Response:

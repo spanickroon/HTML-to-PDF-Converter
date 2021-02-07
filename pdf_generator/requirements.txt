@@ -1,5 +1,10 @@
-beautifulsoup4==4.9.3
+celery==5.0.5
 Django==3.1.6
+django-storages==1.11.1
 djangorestframework==3.12.2
+dropbox==11.1.0
 pdfkit==0.6.1
 psycopg2==2.8.6
+redis==3.5.3
+requests==2.25.1
+temp==2020.7.2

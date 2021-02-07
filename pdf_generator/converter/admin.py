@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import LinkInternetResource, ProcessingRequest
 
-# Register your models here.
+admin.site.register(LinkInternetResource)
+admin.site.register(ProcessingRequest)

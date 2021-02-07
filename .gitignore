@@ -145,3 +145,4 @@ pdf_generator/static/files
 
 # temp files
 *.db
+core
