@@ -8,8 +8,6 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from rest_framework.response import Response
 
-from .serializers import ContentUploadSerializer
-
 
 class ConverterService:
 
@@ -62,42 +60,3 @@ class ConverterService:
                 return HttpResponse(rf.read(), 'application/pdf')
         except OSError:
             return HttpResponse('error')
-
-
-class CheckingValidityIncomingData:
-
-    def __init__(self, file_upload: InMemoryUploadedFile, url_upload: str):
-        self.file_upload = file_upload
-        self.url_upload = url_upload
-
-    def checking_file_validation(self) -> bool:
-        try:
-            return self.file_upload.content_type == 'text/html'
-        except AttributeError:
-            return False
-
-    def checking_requested_resource(self) -> bool:
-        try:
-            requests.get(self.url_upload)
-            return True
-        except requests.exceptions.ConnectionError:
-            return False
-
-
-class DistributionEnteredData:
-
-    @staticmethod
-    def procesing_request_by_data_priority(
-            file_upload: InMemoryUploadedFile,
-            url_upload: str,
-            email_upload: str) -> Response:
-
-        checker_data = CheckingValidityIncomingData(file_upload, url_upload)
-
-        if file_upload and checker_data.checking_file_validation():
-            return ConverterService.converting_html_file_to_pdf(file_upload)
-
-        if url_upload and checker_data.checking_requested_resource():
-            return ConverterService.converting_url_to_pdf(url_upload)
-
-        return Response({'serializer': ContentUploadSerializer})
