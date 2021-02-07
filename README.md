@@ -115,4 +115,6 @@ http://127.0.0.1:8000/converter/
 
 ![image](https://user-images.githubusercontent.com/37241257/107153971-628c6d80-6981-11eb-8484-7baedde0a611.png)
 
+
+### Examples of documents that turned out can be viewed in the examples directory 
 ---
