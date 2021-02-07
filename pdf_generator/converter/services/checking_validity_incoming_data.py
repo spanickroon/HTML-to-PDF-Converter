@@ -5,6 +5,7 @@ for the availability of the Internet resource and file type.
 """
 
 import requests
+import logging
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -23,7 +24,8 @@ class CheckingValidityIncomingData:
         """File Type Matching Check."""
         try:
             return self.file_upload.content_type == 'text/html'
-        except AttributeError:
+        except AttributeError as ex:
+            logging.error(ex)
             return False
 
     def checking_requested_resource(self) -> bool:
@@ -31,5 +33,6 @@ class CheckingValidityIncomingData:
         try:
             requests.get(self.url_upload)
             return True
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as ex:
+            logging.error(ex)
             return False

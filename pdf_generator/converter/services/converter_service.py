@@ -2,12 +2,14 @@
 
 import os
 import time
+import logging
 
 import pdfkit
 import requests
 
 from datetime import datetime
 
+from django.db import DatabaseError, transaction
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.auth.models import User
@@ -38,42 +40,49 @@ class ConverterService:
             conversion_file: InMemoryUploadedFile) -> int:
         """
         A method that creates a new request and returns an ID task.
-        
+
         Which helps in further methods.
         """
+        try:
+            with transaction.atomic():
+                recipient, _ = User.objects.get_or_create(
+                    username=email_upload,
+                    email=email_upload)
 
-        recipient, _ = User.objects.get_or_create(
-            username=email_upload,
-            email=email_upload)
+                if conversion_file:
+                    conversion_file.name = \
+                        ConverterService._generate_file_name(
+                            email_upload, '.html')
 
-        if conversion_file:
-            conversion_file.name = ConverterService._generate_file_name(
-                email_upload, '.html')
+                if conversion_url:
+                    conversion_url, _ = \
+                        LinkInternetResource.objects.get_or_create(
+                            link=conversion_url)
 
-        if conversion_url:
-            conversion_url, _ = LinkInternetResource.objects.get_or_create(
-                link=conversion_url
-            )
+                task_hash = hash(time.time())
 
-        task_hash = hash(time.time())
+                new_request = ProcessingRequest(
+                    user=recipient,
+                    conversion_url=conversion_url,
+                    conversion_file=conversion_file,
+                    task_id=task_hash,
+                    status=1
+                )
 
-        new_request = ProcessingRequest(
-            user=recipient,
-            conversion_url=conversion_url,
-            conversion_file=conversion_file,
-            task_id=task_hash,
-            status=1
-        )
+                new_request.save()
 
-        new_request.save()
-
-        return task_hash
+                return task_hash
+        except DatabaseError as ex:
+            logging.error(ex)
+        except Exception as ex:
+            logging.error()
+        return hash(time.time())
 
     @staticmethod
     def converting_from_file(task_id: int, final_file_name: str) -> None:
         """
         A method that converts a html file to pdf based on the pdfkit library.
-        
+
         Sets the task status to in progress.
         """
         recipient = ProcessingRequest.objects.get(task_id=task_id)
@@ -100,7 +109,7 @@ class ConverterService:
     def converting_from_url(task_id: int, final_file_name: str) -> None:
         """
         A method that converts a urlto pdf based on the pdfkit library.
-        
+
         Sets the task status to in progress.
         """
         recipient = ProcessingRequest.objects.get(task_id=task_id)

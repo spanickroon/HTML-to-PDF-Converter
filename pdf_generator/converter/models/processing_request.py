@@ -73,6 +73,7 @@ class ProcessingRequest(models.Model):
         upload_to='documents/pdf',
         blank=True,
         null=True,
+        db_index=True,
         verbose_name='Итоговый файл pdf'
     )
 
