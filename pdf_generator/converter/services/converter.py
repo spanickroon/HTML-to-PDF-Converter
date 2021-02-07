@@ -1,5 +1,6 @@
 """The module in which the selection of tasks occurs."""
 
+import logging
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from .converter_service import ConverterService
@@ -28,10 +29,10 @@ class Converter:
             final_file_name = ConverterService._generate_file_name(
                 email_upload, '.pdf')
 
-        except (OSError, AttributeError, FileNotFoundError):
-            pass
+        except (OSError, AttributeError, FileNotFoundError) as ex:
+            logging.log(ex)
         except Exception as ex:
-            pass
+            logging.log(ex)
 
         celery_task_converting_html.delay(task_id, final_file_name)
 
@@ -54,9 +55,9 @@ class Converter:
             final_file_name = ConverterService._generate_file_name(
                 email_upload, '.pdf')
 
-        except (OSError, AttributeError, FileNotFoundError):
-            pass
+        except (OSError, AttributeError, FileNotFoundError) as ex:
+            logging.log(ex)
         except Exception as ex:
-            pass
+            logging.log(ex)
 
         celery_task_converting_url.delay(task_id, final_file_name)
